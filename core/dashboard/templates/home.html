@@ -25,10 +25,10 @@
 
         //configuration for the bar graph
         var barConfig = {
-            type: 'bar',
+            type: 'doughnut',
             data: {
                 datasets: [{
-                    backgroundColor: '#1a79a5',
+                    backgroundColor:[ '#1a79a5','rgb(255, 99, 132)','rgb(54, 162, 235)','rgb(255, 205, 86)'],
                     label: 'Stock in Inventory',
                     data: {{ data|safe }},
                 }],
