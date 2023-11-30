@@ -13,6 +13,9 @@ urlpatterns= [
          path('inventory/<int:pk>/delete', views.DeleteStockView.as_view(), name='delete-stock'),
 
          path('purchases/', views.PurchaseView.as_view(), name='purchases-list'),
-         path('purchases/new/pk', views.PurchaseCreateView.as_view(), name='new-purchase'),
+         path('purchases-new/', views.PurchaseCreateView.as_view(), name='new-purchase'),
          path("purchases/<billno>", views.PurchaseBillView.as_view(), name="purchase-bill"),
+
+         path('sales/', views.SalesView.as_view(), name='sales-list'),
+         path("sales/<billno>", views.SalesBillView.as_view(), name="sale-bill"),
 ]

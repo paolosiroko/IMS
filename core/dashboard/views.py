@@ -116,43 +116,29 @@ class PurchaseBillView(ListView):
 
 class PurchaseCreateView(CreateView):
     model = Stock
-    form_class = CreateForm
+    form_class = PurchaseCreateForm
     success_url = reverse_lazy('purchases-list')
     template_name = 'form.html'
 
-    def get(self, request, pk):
-        formset = PurchaseCreateForm(request.GET or None)                      # renders an empty formset
-        stockobj = get_object_or_404(Stock, pk=pk)                        # gets the supplier object
-        context = {
-            'formset'   : formset,
-            'stock'  : stockobj,
-        }                                                                       # sends the supplier and formset as context
-        return render(request, self.template_name, context)
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(CreateView, self).form_valid(form)
 
-    def post(self, request, pk):
-        formset = PurchaseCreateForm(request.POST)                             # recieves a post method for the formset
-        stockobj = get_object_or_404(Stock, pk=pk)                        # gets the supplier object
-        if formset.is_valid():
-            # saves bill
-            billobj = PurchaseItem(stock=stockobj)                        # a new object of class 'PurchaseBill' is created with supplier field set to 'supplierobj'
-            billobj.save()                                                      # saves object into the db
-            for form in formset:                                                # for loop to save each individual form as its own object
-                # false saves the item and links bill to the item
-                billitem = form.save(commit=False)
-                billitem.billno = billobj                                       # links the bill object to the items
-                # gets the stock item
-                stock = get_object_or_404(Stock, name=billitem.stock.name)       # gets the item
-                # calculates the total price
-                billitem.totalprice = billitem.perprice * billitem.quantity
-                # updates quantity in stock db
-                stock.quantity += billitem.quantity                              # updates quantity
-                # saves bill item and stock
-                stock.save()
-                billitem.save()
-            return redirect('purchase-bill', billno=billobj.billno)
-        formset = PurchaseCreateForm(request.GET or None)
+
+class SalesView(ListView):
+    model = SalesItem
+    template_name = "sales/sales_list.html"
+    context_object_name = 'sales'
+    paginate_by = 10
+
+
+class SalesBillView(ListView):
+    model = PurchaseItem
+    template_name = "bill/sales_bill.html"
+
+    def get(self, request, billno):
         context = {
-            'formset'   : formset,
-            'stock'  : stockobj
+            'bill': SalesItem.objects.get()
         }
         return render(request, self.template_name, context)
+
