@@ -1,5 +1,5 @@
 from django import forms
-from .models import Stock,PurchaseItem
+from .models import Stock,PurchaseItem,SalesItem
 
 
 class CreateForm(forms.ModelForm):
@@ -31,6 +31,18 @@ class UpdateForm(forms.ModelForm):
 class PurchaseCreateForm(forms.ModelForm):
     class Meta:
         model = PurchaseItem
+        fields = ('stock','quantity','perprice','totalprice')
+
+        widgets ={
+            'stock':forms.Select(attrs={'class':'form-control'}),
+            'quantity': forms.TextInput(attrs={'class': 'form-control'}),
+            'perprice':forms.TextInput(attrs={'class':'form-control'}),
+            'totalprice': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class SalesCreateForm(forms.ModelForm):
+    class Meta:
+        model = SalesItem
         fields = ('stock','quantity','perprice','totalprice')
 
         widgets ={

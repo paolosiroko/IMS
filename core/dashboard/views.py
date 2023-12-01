@@ -10,9 +10,9 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView,UpdateView,DeleteView,FormView
 from  .models import Stock,PurchaseItem,SalesItem
-from .forms import CreateForm,UpdateForm,PurchaseCreateForm
+from .forms import CreateForm,UpdateForm,PurchaseCreateForm,SalesCreateForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from .filters import StockFilter
+from .filters import StockFilter,PurchaseFilter,SalesFilter
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -102,6 +102,24 @@ class PurchaseView(ListView):
     context_object_name = 'bills'
     paginate_by = 10
 
+    def get(self, request,*args,**kwargs):
+        bills = PurchaseItem.objects.all().order_by('billno')
+        myFilter = PurchaseFilter(request.GET, queryset=bills)
+        bills = myFilter.qs
+        paginator = Paginator(bills, self.paginate_by)
+        page = request.GET.get('page')
+        try:
+            bills = paginator.page(page)
+        except PageNotAnInteger:
+            bills = paginator.page('1')
+        except EmptyPage:
+            bills = paginator.page(paginator.num_page)
+
+        context = {'bills': bills,
+                   'myFilter': myFilter
+                   }
+        return render(request, self.template_name, context=context)
+
 
 class PurchaseBillView(ListView):
     model = PurchaseItem
@@ -131,6 +149,24 @@ class SalesView(ListView):
     context_object_name = 'sales'
     paginate_by = 10
 
+    def get(self, request,*args,**kwargs):
+        sales = SalesItem.objects.all().order_by('billno')
+        myFilter = SalesFilter(request.GET, queryset=sales)
+        sales = myFilter.qs
+        paginator = Paginator(sales, self.paginate_by)
+        page = request.GET.get('page')
+        try:
+            sales = paginator.page(page)
+        except PageNotAnInteger:
+            sales = paginator.page('1')
+        except EmptyPage:
+            sales= paginator.page(paginator.num_page)
+
+        context = {'sales': sales,
+                   'myFilter': myFilter
+                   }
+        return render(request, self.template_name, context=context)
+
 
 class SalesBillView(ListView):
     model = PurchaseItem
@@ -142,3 +178,12 @@ class SalesBillView(ListView):
         }
         return render(request, self.template_name, context)
 
+class SalesCreateView(CreateView):
+    model = Stock
+    form_class = SalesCreateForm
+    success_url = reverse_lazy('sales-list')
+    template_name = 'form.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(CreateView, self).form_valid(form)

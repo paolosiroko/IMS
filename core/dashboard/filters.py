@@ -12,3 +12,18 @@ class StockFilter(django_filters.FilterSet):
     class Meta:
         model = Stock
         fields = ['name','product_type','product_material']
+
+
+class PurchaseFilter(django_filters.FilterSet):
+    quantity = CharFilter(field_name='quantity', lookup_expr="icontains", label='Quantity : ')
+
+    class Meta:
+        model = PurchaseItem
+        fields = ['quantity']
+
+class SalesFilter(django_filters.FilterSet):
+    quantity = CharFilter(field_name='quantity', lookup_expr="icontains", label='Quantity : ')
+
+    class Meta:
+        model = SalesItem
+        fields = ['quantity']

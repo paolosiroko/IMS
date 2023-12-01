@@ -2,7 +2,7 @@
 <!-- Log on to codeastro.com for more projects -->
 {% load static %}
 
-
+{% load crispy_forms_tags %}
 {% block title %} Home {% endblock title %}
 
 
@@ -11,11 +11,17 @@
     <div class="row" style="color: #575757; font-style: bold; font-size: 3rem;">
         <div class="col-md-8">Sales List</div>
         <div class="col-md-4">            <!-- Log on to codeastro.com for more projects -->
-            <div style="float:right;"> <a class="btn btn-success" href="">New sale</a> </div>
+            <div style="float:right;"> <a class="btn btn-success" href="{% url 'new-sale' %}">New sale</a> </div>
         </div>
     </div>
 
     <br>
+<div class="container mt-3">
+  <form class="form-inline justify-content-end mb-3">
+    {{ myFilter.form|crispy }}
+    <button class="btn btn-outline-success ml-2" type="submit">Search</button>
+  </form>
+</div>
 
     <table class="table table-css table-hover table-bordered">
 
@@ -40,11 +46,35 @@
                 <td class="align-middle">{{ sale.perprice }}</td>
                 <td class="align-middle">{{ sale.quantity }}</td>
                 <td class="align-middle">${{ sale.totalprice }}</td>
-                <td class="align-middle"> <a href="{% url 'sale-bill' sale.billno %}" class="btn btn-secondary btn-sm">View Bill</a> <a href="" class="btn btn-danger btn-sm">Delete Bill</a> </td>
+                <td class="align-middle"> <a href="{% url 'sale-bill' sale.billno %}" class="btn btn-secondary btn-sm">View Bill</a> </td>
             </tr>
             {% endfor %}
         </tbody>
 
     </table>
 {% endif %}
+                                       <!-- pagination -->
+
+       <div style="margin-top: 5px;">
+        {% if  sales.has_other_pages %}
+        <ul class="pagination">
+            {% if  sales.has_previous %}
+            <li class="page-item"><a href="?page={{ projects.previous_page_number }}" class="page-link">&laquo;</a> </li>
+            {% endif %}
+
+            {% for i in sales.paginator.page_range %}
+            {% if updates.number == i %}
+            <li class="page-item"><a class="active page-link">{{ i }}</a> </li>
+            {% else %}
+            <li class="page-item"><a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if  sales.has_next %}
+            <li class="page-item"><a href="?page={{ projects.next_page_number }}" class="page-link">&raquo;</a></li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+       <!-- /.pagination -->
 {% endblock content %}
